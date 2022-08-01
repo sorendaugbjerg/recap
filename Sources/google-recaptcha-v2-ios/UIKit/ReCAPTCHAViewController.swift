@@ -38,7 +38,7 @@ public class ReCAPTCHAViewController: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         
-        webView.loadHTMLString(viewModel.html, baseURL: nil)
+        webView.loadHTMLString(viewModel.html, baseURL: viewModel.domainURL)
     }
 }
 

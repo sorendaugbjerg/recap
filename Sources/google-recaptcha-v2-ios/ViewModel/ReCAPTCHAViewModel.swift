@@ -8,19 +8,22 @@ import Foundation
 
 public class ReCAPTCHAViewModel: NSObject {
     private let siteKey: String
+    public var html: String {
+        htmlString.replacingOccurrences(of: "${siteKey}", with: siteKey)
+    }
+    public let domainURL: URL
+    
     private let completion: (String) -> Void
     
     /// Creates a ReCAPTCHARViewModel
     ///  - Parameters:
     ///    - siteKey: key for communication with the Google ReCAPTCHA service
+    ///    - domainURL: the domain registred with the Google ReCAPTCHA service
     ///    - completion: returns a ReCAPTCHA token to be send to and verified by the apps backend API
-    public init(siteKey: String, completion: @escaping (String) -> Void) {
+    public init(siteKey: String, domainURL: URL, completion: @escaping (String) -> Void) {
         self.siteKey = siteKey
+        self.domainURL = domainURL
         self.completion = completion
-    }
-    
-    public var html: String {
-        htmlString.replacingOccurrences(of: "${siteKey}", with: siteKey)
     }
     
     public func handle(message: String) {
