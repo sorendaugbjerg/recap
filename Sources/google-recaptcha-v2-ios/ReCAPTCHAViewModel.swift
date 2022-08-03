@@ -12,21 +12,24 @@ public class ReCAPTCHAViewModel: NSObject {
         htmlString.replacingOccurrences(of: "${siteKey}", with: siteKey)
     }
     public let domainURL: URL
-    
-    private let completion: (String) -> Void
+    private let delegate: ReCAPTCHADelegate
     
     /// Creates a ReCAPTCHARViewModel
     ///  - Parameters:
     ///    - siteKey: key for communication with the Google ReCAPTCHA service
     ///    - domainURL: the domain registred with the Google ReCAPTCHA service
-    ///    - completion: returns a ReCAPTCHA token to be send to and verified by the apps backend API
-    public init(siteKey: String, domainURL: URL, completion: @escaping (String) -> Void) {
+    ///    - delegate: class taking the result of the ReCAPTCHA challenge
+    public init(
+        siteKey: String,
+        domainURL: URL,
+        delegate: ReCAPTCHADelegate
+    ) {
         self.siteKey = siteKey
         self.domainURL = domainURL
-        self.completion = completion
+        self.delegate = delegate
     }
     
-    public func handle(message: String) {
-        completion(message)
+    public func handle(token: String) {
+        delegate.handle(token: token)
     }
 }

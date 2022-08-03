@@ -48,11 +48,11 @@ extension ReCAPTCHAViewController: WKScriptMessageHandler {
         _ userContentController: WKUserContentController,
         didReceive message: WKScriptMessage
     ) {
-        guard let message = message.body as? String else {
+        guard let token = message.body as? String else {
             assertionFailure("Expected a String")
             return
         }
         
-        viewModel.handle(message: message)
+        viewModel.handle(token: token)
     }
 }
