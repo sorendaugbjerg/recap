@@ -7,15 +7,33 @@
 import UIKit
 import WebKit
 
+public protocol ReCAPTCHADelegate {
+    func handle(token: String)
+}
+
 public class ReCAPTCHAViewController: UIViewController {
     private var webView: WKWebView!
-    private var viewModel: ReCAPTCHAViewModel
+    private let siteKey: String
+    private var html: String {
+        htmlString.replacingOccurrences(of: "${siteKey}", with: siteKey)
+    }
+    private let domainURL: URL
+    private let delegate: ReCAPTCHADelegate
     
-    /// Creates a ReCAPTCHAWebView
-    ///  - Parameters:
-    ///    - viewModel: ReCAPTCHAViewModel
-    public init(viewModel: ReCAPTCHAViewModel) {
-        self.viewModel = viewModel
+    /// Creartes a ReCAPTCHAViewController
+    /// Instantiates a ViewController to handle a ReCAPTCHA challenge, and sets it's delegate.
+    ///
+    ///  - parameter siteKey: key for communication with the Google ReCAPTCHA service
+    ///  - parameter domainURL: the domain registred with the Google ReCAPTCHA service
+    ///  - parameter delegate: class handling the result of the ReCAPTCHA challenge
+    public init(
+        siteKey: String,
+        domainURL: URL,
+        delegate: ReCAPTCHADelegate
+    ) {
+        self.siteKey = siteKey
+        self.domainURL = domainURL
+        self.delegate = delegate
         
         super.init(nibName: nil, bundle: nil)
     }
@@ -38,7 +56,7 @@ public class ReCAPTCHAViewController: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         
-        webView.loadHTMLString(viewModel.html, baseURL: viewModel.domainURL)
+        webView.loadHTMLString(html, baseURL: domainURL)
     }
 }
 
@@ -53,6 +71,41 @@ extension ReCAPTCHAViewController: WKScriptMessageHandler {
             return
         }
         
-        viewModel.handle(token: token)
+        delegate.handle(token: token)
     }
 }
+
+
+// MARK: - HTML String
+public let htmlString = #"""
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://www.google.com/recaptcha/api.js?onload=onLoad&render=explicit" async defer></script>
+    <title></title>
+    <script type="text/javascript">
+      const post = function(message) {
+          window.webkit.messageHandlers.recaptcha.postMessage(message);
+      };
+
+      var onLoad = function() {
+          grecaptcha.render(
+            "recaptcha",
+            {
+              sitekey: "${siteKey}",
+              callback: function(message) {
+                  post(message);
+              },
+              size: "normal"
+            }
+          );
+      };
+    </script>
+  </head>
+  <body>
+      <div id="recaptcha"></div>
+  </body>
+</html>
+"""#
