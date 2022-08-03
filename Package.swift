@@ -3,7 +3,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "google-recaptcha-v2-ios",
+    name: "google-recaptcha-v2",
     platforms: [
         .iOS(.v12)
     ],
@@ -16,9 +16,6 @@ let package = Package(
     targets: [
         .target(
             name: "google-recaptcha-v2-ios",
-            dependencies: []),
-        .testTarget(
-            name: "google-recaptcha-v2-iosTests",
-            dependencies: ["google-recaptcha-v2-ios"]),
+            dependencies: [])
     ]
 )
